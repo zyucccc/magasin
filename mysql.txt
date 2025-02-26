@@ -1,0 +1,130 @@
+// Mysql
+// -- 创建数据库
+// CREATE DATABASE IF NOT EXISTS magasin;
+// USE magasin;
+//
+// -- 用户表
+// CREATE TABLE user (
+// id INT AUTO_INCREMENT PRIMARY KEY,
+// email VARCHAR(255) NOT NULL UNIQUE,
+// password VARCHAR(255) NOT NULL,
+// nom VARCHAR(100) NOT NULL,
+// prenom VARCHAR(100) NOT NULL,
+// adresse TEXT,
+// code_postal VARCHAR(20),
+// ville VARCHAR(100),
+// pays VARCHAR(100) DEFAULT 'France',
+// telephone VARCHAR(20),
+// is_admin BOOLEAN DEFAULT FALSE,
+// date_creation DATETIME DEFAULT CURRENT_TIMESTAMP
+// );
+//
+// -- 商品分类表
+// CREATE TABLE categorie (
+// id INT AUTO_INCREMENT PRIMARY KEY,
+// nom VARCHAR(100) NOT NULL,
+// description TEXT
+// );
+//
+// -- 商品表
+// CREATE TABLE article (
+// id INT AUTO_INCREMENT PRIMARY KEY,
+// nom VARCHAR(255) NOT NULL,
+// prix DECIMAL(10, 2) NOT NULL,
+// description TEXT,
+// image VARCHAR(255),
+// categorie_id INT,
+// date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
+// FOREIGN KEY (categorie_id) REFERENCES categorie(id) ON DELETE SET NULL
+// );
+//
+// -- 尺寸选项表
+// CREATE TABLE taille (
+// id INT AUTO_INCREMENT PRIMARY KEY,
+// nom VARCHAR(50) NOT NULL
+// );
+//
+// -- 商品库存表 (关联商品和尺寸)
+// CREATE TABLE stock (
+// id INT AUTO_INCREMENT PRIMARY KEY,
+// article_id INT NOT NULL,
+// taille_id INT NOT NULL,
+// quantite INT NOT NULL DEFAULT 0,
+// FOREIGN KEY (article_id) REFERENCES article(id) ON DELETE CASCADE,
+// FOREIGN KEY (taille_id) REFERENCES taille(id) ON DELETE CASCADE,
+// UNIQUE KEY unique_article_taille (article_id, taille_id)
+// );
+//
+// -- 购物车表
+// CREATE TABLE panier (
+// id INT AUTO_INCREMENT PRIMARY KEY,
+// user_id INT NOT NULL,
+// date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
+// FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+// );
+//
+// -- 购物车详情表
+// CREATE TABLE panier_item (
+// id INT AUTO_INCREMENT PRIMARY KEY,
+// panier_id INT NOT NULL,
+// stock_id INT NOT NULL,
+// quantite INT NOT NULL DEFAULT 1,
+// date_ajout DATETIME DEFAULT CURRENT_TIMESTAMP,
+// FOREIGN KEY (panier_id) REFERENCES panier(id) ON DELETE CASCADE,
+// FOREIGN KEY (stock_id) REFERENCES stock(id) ON DELETE CASCADE
+// );
+//
+// -- 订单状态表
+// CREATE TABLE statut_commande (
+// id INT AUTO_INCREMENT PRIMARY KEY,
+// nom VARCHAR(50) NOT NULL,
+// description TEXT
+// );
+//
+// -- 订单表
+// CREATE TABLE commande (
+// id INT AUTO_INCREMENT PRIMARY KEY,
+// user_id INT NOT NULL,
+// reference VARCHAR(50) NOT NULL UNIQUE,
+// total DECIMAL(10, 2) NOT NULL,
+// statut_id INT NOT NULL,
+// adresse_livraison TEXT NOT NULL,
+// code_postal_livraison VARCHAR(20) NOT NULL,
+// ville_livraison VARCHAR(100) NOT NULL,
+// pays_livraison VARCHAR(100) NOT NULL DEFAULT 'France',
+// telephone_livraison VARCHAR(20),
+// date_commande DATETIME DEFAULT CURRENT_TIMESTAMP,
+// FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE RESTRICT,
+// FOREIGN KEY (statut_id) REFERENCES statut_commande(id) ON DELETE RESTRICT
+// );
+//
+// -- 订单详情表
+// CREATE TABLE commande_detail (
+// id INT AUTO_INCREMENT PRIMARY KEY,
+// commande_id INT NOT NULL,
+// article_id INT NOT NULL,
+// taille_id INT NOT NULL,
+// prix_unitaire DECIMAL(10, 2) NOT NULL,
+// quantite INT NOT NULL,
+// FOREIGN KEY (commande_id) REFERENCES commande(id) ON DELETE CASCADE,
+// FOREIGN KEY (article_id) REFERENCES article(id) ON DELETE RESTRICT,
+// FOREIGN KEY (taille_id) REFERENCES taille(id) ON DELETE RESTRICT
+// );
+//
+// -- 插入订单状态数据
+// INSERT INTO statut_commande (nom, description) VALUES
+// ('En attente', 'Commande en attente de traitement'),
+// ('Confirmée', 'Commande confirmée'),
+// ('En préparation', 'Commande en cours de préparation'),
+// ('Expédiée', 'Commande expédiée'),
+// ('Livrée', 'Commande livrée'),
+// ('Annulée', 'Commande annulée');
+//
+// -- 插入基本尺寸数据
+// INSERT INTO taille (nom) VALUES
+// ('XS'),
+// ('S'),
+// ('M'),
+// ('L'),
+// ('XL'),
+// ('XXL');
