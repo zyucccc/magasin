@@ -1,0 +1,71 @@
+-- 首先确保有分类数据
+INSERT INTO categorie (nom, description) VALUES
+('Colliers', 'Tous nos colliers en cristaux'),
+('Bracelets', 'Bracelets en pierres fines et cristaux'),
+('Bagues', 'Bagues en pierres naturelles'),
+('Kits de Cristaux', 'Ensembles de cristaux pour guérison et méditation');
+
+-- 添加商品数据
+INSERT INTO article (nom, prix, description, image, categorie_id, date_creation) VALUES
+-- 项链
+('Collier Quartz Rose - Amour et Harmonie', 129.99, 'Le quartz rose est connu comme la pierre de l\'amour inconditionnel. Il apporte douceur, tendresse et guérison émotionnelle.', 'collier-quartz-rose.jpg', 1, NOW()),
+('Collier Lapis Lazuli - Protection Énergétique', 149.99, 'Le lapis lazuli est une pierre de protection qui aide à repousser les énergies négatives et à ouvrir le troisième œil pour une meilleure intuition.', 'collier-lapis-lazuli.jpg', 1, NOW()),
+('Collier Améthyste - Spiritualité et Intuition', 139.99, 'L\'améthyste est une pierre apaisante qui favorise la clarté mentale, l\'intuition et la connexion spirituelle.', 'collier-amethyste.jpg', 1, NOW()),
+('Collier Agate Verte - Renouveau et Croissance', 159.99, 'L\'agate verte apporte équilibre et harmonie. Elle favorise la croissance personnelle et la connexion avec la nature.', 'collier-agate-verte.jpg', 1, NOW()),
+('Collier Onyx Noir - Sérénité et Force', 169.99, 'L\'onyx noir est une pierre de protection et de force. Elle aide à dissiper les peurs et à trouver la stabilité émotionnelle.', 'collier-onyx-noir.jpg', 1, NOW()),
+
+-- 手镯
+('Bracelet Quartz Clair - Clarté Mentale', 89.99, 'Le quartz clair amplifie l\'énergie et la clarté mentale. Il aide à la concentration et à la méditation.', 'bracelet-quartz-clair.jpg', 2, NOW()),
+('Bracelet Turquoise - Guérison et Protection', 99.99, 'La turquoise est une pierre de guérison et de protection. Elle apporte chance et positivité.', 'bracelet-turquoise.jpg', 2, NOW()),
+('Bracelet Œil de Tigre - Courage et Confiance', 79.99, 'L\'œil de tigre renforce la confiance en soi et le courage. Il aide à prendre des décisions avec discernement.', 'bracelet-oeil-tigre.jpg', 2, NOW()),
+
+-- 戒指
+('Bague Amazonite - Équilibre et Harmonie', 69.99, 'L\'amazonite apporte équilibre émotionnel et harmonie. Elle aide à communiquer avec sincérité et compassion.', 'bague-amazonite.jpg', 3, NOW()),
+('Bague Grenat - Passion et Vitalité', 79.99, 'Le grenat stimule la passion et la vitalité. Il renforce la détermination et l\'engagement.', 'bague-grenat.jpg', 3, NOW()),
+
+-- 水晶套装
+('Kit de Méditation - 7 Cristaux Chakras', 129.99, 'Ensemble de 7 cristaux correspondant aux chakras pour équilibrer votre énergie lors de la méditation.', 'kit-meditation-chakras.jpg', 4, NOW()),
+('Kit de Guérison - Cristaux Essentiels', 149.99, 'Collection de cristaux essentiels pour la guérison énergétique et le bien-être quotidien.', 'kit-guerison.jpg', 4, NOW());
+
+-- 确保尺寸数据存在
+INSERT IGNORE INTO taille (nom) VALUES
+('XS'),
+('S'),
+('M'),
+('L'),
+('XL'),
+('Unique'); -- 对于一些只有单一尺寸的商品
+
+-- 添加库存数据
+INSERT INTO stock (article_id, taille_id, quantite) VALUES
+-- 项链库存 (大多为Unique尺寸)
+(1, 6, 15), -- Collier Quartz Rose
+(2, 6, 10), -- Collier Lapis Lazuli
+(3, 6, 8),  -- Collier Améthyste
+(4, 6, 12), -- Collier Agate Verte
+(5, 6, 0),  -- Collier Onyx Noir (缺货)
+
+-- 手镯库存 (多种尺寸)
+(6, 2, 5),  -- Bracelet Quartz Clair - S
+(6, 3, 8),  -- Bracelet Quartz Clair - M
+(6, 4, 6),  -- Bracelet Quartz Clair - L
+(7, 2, 4),  -- Bracelet Turquoise - S
+(7, 3, 7),  -- Bracelet Turquoise - M
+(7, 4, 0),  -- Bracelet Turquoise - L (缺货)
+(8, 2, 6),  -- Bracelet Œil de Tigre - S
+(8, 3, 9),  -- Bracelet Œil de Tigre - M
+(8, 4, 4),  -- Bracelet Œil de Tigre - L
+
+-- 戒指库存 (多种尺寸)
+(9, 1, 3),  -- Bague Amazonite - XS
+(9, 2, 6),  -- Bague Amazonite - S
+(9, 3, 5),  -- Bague Amazonite - M
+(9, 4, 4),  -- Bague Amazonite - L
+(10, 1, 0), -- Bague Grenat - XS (缺货)
+(10, 2, 5), -- Bague Grenat - S
+(10, 3, 7), -- Bague Grenat - M
+(10, 4, 3), -- Bague Grenat - L
+
+-- 水晶套装库存 (Unique尺寸)
+(11, 6, 10), -- Kit de Méditation
+(12, 6, 6);  -- Kit de Guérison
