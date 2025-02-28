@@ -1,5 +1,33 @@
 // @/app/interfaces/interfaces.ts
 
+//panier
+export interface CartItem {
+    product: Product;
+    quantity: number;
+    size: string;
+}
+
+export interface CartProps {
+    isOpen: boolean;
+    onClose: () => void;
+}
+
+export interface CartContextType {
+    cartItems: CartItem[];
+    isCartOpen: boolean;
+    subtotal: number;
+    itemCount: number;
+    freeShippingQualified: boolean;
+    freeShippingThreshold: number;
+    addToCart: (product: Product, quantity: number, size: string) => void;
+    removeFromCart: (index: number) => void;
+    updateQuantity: (index: number, quantity: number) => void;
+    openCart: () => void;
+    closeCart: () => void;
+    clearCart: () => void;
+}
+
+//DB interface
 export interface Size {
     id: number;
     name: string;

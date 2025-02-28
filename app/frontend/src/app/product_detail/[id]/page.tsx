@@ -1,16 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import Navbar from "@/app/frontend/src/components/navigation/Navbar";
 import Footer from "@/app/frontend/src/components/footer/Footer";
 import { ProductDetail, Product, Size } from '@/app/interfaces/interfaces';
+import {CartProvider,useCart} from '@//app/frontend/src/components/cart/CartContext';
+import Cart from '@/app/frontend/src/components/cart/Cart';
+
 
 export default function ProductDetailPage() {
     const params = useParams();
-    const router = useRouter();
     const productId = params.id;
 
     const [product, setProduct] = useState<ProductDetail | null>(null);
@@ -18,7 +20,10 @@ export default function ProductDetailPage() {
     const [selectedSize, setSelectedSize] = useState<Size | null>(null);
     const [quantity, setQuantity] = useState(1);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('DESCRIPTION');
+    // const [activeTab, setActiveTab] = useState('DESCRIPTION');
+
+
+
 
     // get product details
     useEffect(() => {
@@ -58,6 +63,31 @@ export default function ProductDetailPage() {
         fetchProductDetail();
     }, [productId]);
 
+    {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+    {/*// @ts-expect-error*/}
+    function AddToCartButton({ product, selectedSize, quantity, isInStock, onValidate }) {
+        const { addToCart } = useCart();
+
+        return (
+            <button
+                onClick={() => {
+                    if(onValidate()){
+                        addToCart(product, quantity, selectedSize.name);
+                        alert(`Added to cart: ${product.name}, Size: ${selectedSize.name}, number: ${quantity}`);
+                    }
+                }}
+                disabled={!isInStock || !selectedSize}
+                className={`w-full py-3 px-6 text-white font-medium rounded-md ${
+                    isInStock && selectedSize
+                        ? 'bg-black hover:bg-gray-800'
+                        : 'bg-gray-400 cursor-not-allowed'
+                }`}
+            >
+                {isInStock ? 'Add to panier' : 'epuisé'}
+            </button>
+        );
+    }
+
     // 处理数量变更
     const handleQuantityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setQuantity(parseInt(e.target.value, 10));
@@ -71,21 +101,21 @@ export default function ProductDetailPage() {
     };
 
     // 加入购物车
-    const handleAddToCart = () => {
+    const validateCartAddition = () => {
         if (!product || !selectedSize) {
-            alert('请先选择尺寸');
-            return;
+            alert('Please choose the size');
+            return false;
         }
-
-        // panier
-        alert(`已加入购物车: ${product.name}, 尺寸: ${selectedSize.name}, 数量: ${quantity}`);
+        return true;
     };
 
     if (loading) {
         return (
             <div className="bg-white w-full min-h-screen">
+                <CartProvider>
                 <Navbar theme="light" />
                 <div className="container mx-auto px-4 py-16 pt-24 text-gray-800">Loading...</div>
+                </CartProvider>
                 <Footer />
             </div>
         );
@@ -94,13 +124,15 @@ export default function ProductDetailPage() {
     if (!product) {
         return (
             <div className="bg-white w-full min-h-screen">
+                <CartProvider>
                 <Navbar />
                 <div className="container mx-auto px-4 py-16 pt-24 text-gray-800">
-                    <h1 className="text-2xl font-bold mb-4">产品不存在</h1>
+                    <h1 className="text-2xl font-bold mb-4">product not found</h1>
                     <Link href="/shop-all" className="text-indigo-600 hover:text-indigo-800">
-                        返回商品列表
+                        return to shop
                     </Link>
                 </div>
+                </CartProvider>
                 <Footer />
             </div>
         );
@@ -108,8 +140,9 @@ export default function ProductDetailPage() {
 
     return (
         <div className="bg-white w-full min-h-screen">
+            <CartProvider>
             <Navbar />
-
+            <Cart />
             {/* 面包屑导航 */}
             <div className="container mx-auto px-4 py-4 pt-20 text-sm">
                 <nav className="flex" aria-label="Breadcrumb">
@@ -202,17 +235,17 @@ export default function ProductDetailPage() {
                             )}
                             {product.onSale && product.originalPrice && (
                                 <span className="ml-3 px-2 py-1 text-xs bg-red-100 text-red-700 rounded">
-                                    省 ${(product.originalPrice - product.price).toFixed(2)}
+                                    Save ${(product.originalPrice - product.price).toFixed(2)}
                                 </span>
                             )}
                         </div>
 
                         {/* promotion */}
-                        {product.onSale && (
-                            <div className="mb-6 bg-gray-50 border border-gray-200 px-4 py-3 rounded-md text-black">
-                                {/*<p className="text-sm">额外15%折扣 - 满$160享免运费</p>*/}
-                            </div>
-                        )}
+                        {/*{product.onSale && (*/}
+                        {/*    <div className="mb-6 bg-gray-50 border border-gray-200 px-4 py-3 rounded-md text-black">*/}
+                        {/*        <p className="text-sm">额外15%折扣 - 满$160享免运费</p>*/}
+                        {/*    </div>*/}
+                        {/*)}*/}
 
                         {/* Size */}
                         <div className="mb-6">
@@ -257,17 +290,13 @@ export default function ProductDetailPage() {
 
                         {/* bouton panier */}
                         <div className="mb-8">
-                            <button
-                                onClick={handleAddToCart}
-                                disabled={!product.inStock || !selectedSize}
-                                className={`w-full py-3 px-6 text-white font-medium rounded-md ${
-                                    product.inStock && selectedSize
-                                        ? 'bg-black hover:bg-gray-800'
-                                        : 'bg-gray-400 cursor-not-allowed'
-                                }`}
-                            >
-                                {product.inStock ? 'Add to panier' : 'epuisé'}
-                            </button>
+                            <AddToCartButton
+                                product={product}
+                                selectedSize={selectedSize}
+                                quantity={quantity}
+                                isInStock={product.inStock}
+                                onValidate={validateCartAddition}
+                            />
                         </div>
 
                         {/* Features */}
@@ -283,14 +312,18 @@ export default function ProductDetailPage() {
                         {/* ship policy */}
                         <div className="border-t border-gray-200 pt-6">
                             <div className="flex items-center mb-4">
-                                <svg className="h-5 w-5 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                <svg className="h-5 w-5 text-gray-500 mr-2" fill="none" stroke="currentColor"
+                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                          d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                                 </svg>
                                 <span className="text-sm text-black">ship standard 5-7 days</span>
                             </div>
                             <div className="flex items-center">
-                                <svg className="h-5 w-5 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
+                                <svg className="h-5 w-5 text-gray-500 mr-2" fill="none" stroke="currentColor"
+                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                          d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"/>
                                 </svg>
                                 <span className="text-sm text-gray-700">return in 7 days</span>
                             </div>
@@ -367,7 +400,7 @@ export default function ProductDetailPage() {
                     </div>
                 )}
             </div>
-
+            </CartProvider>
             <Footer />
         </div>
     );

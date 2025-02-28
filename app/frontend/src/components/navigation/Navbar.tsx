@@ -1,6 +1,10 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { usePathname } from 'next/navigation'
+// hook cart
+import { ShoppingBag } from 'lucide-react'
+import { useCart } from '@/app/frontend/src/components/cart/CartContext'
+
 
 interface NavbarProps {
     theme?: 'light' | 'dark';
@@ -9,6 +13,8 @@ interface NavbarProps {
 export default function Navbar({ theme }: NavbarProps) {
     const [mouse_on_Link, set_mouse_on_link] = useState('/init')
     const pathname = usePathname()
+    // hook cart
+    const { openCart, itemCount } = useCart()
 
     const in_light_mode = pathname === '/frontend/src/app/shop_all' || pathname.startsWith('/frontend/src/app/product_detail/')
     const autoTheme = in_light_mode ? 'light' : 'dark'
@@ -77,6 +83,25 @@ export default function Navbar({ theme }: NavbarProps) {
                                 className={`absolute bottom-0 left-0 w-full h-0.5 ${underlineColor} transition-transform duration-300 ${mouse_on_Link === '/services' ? 'scale-x-100' : 'scale-x-0'} group-hover:scale-x-100 origin-left`}
                             ></span>
                         </Link>
+                    </div>
+
+                    {/* cart */}
+                    <div className="flex items-center">
+                        <button
+                            onClick={() => {
+                                // console.log("click");
+                                openCart();
+                            }}
+                            className={`relative ${textColor} ${hoverColor} ml-4 focus:outline-none`}
+                            aria-label="Shopping cart"
+                        >
+                            <ShoppingBag size={22} />
+                            {itemCount > 0 && (
+                                <span className={`absolute -top-2 -right-2 ${currentTheme === 'dark' ? 'bg-white text-black' : 'bg-black text-white'} text-xs rounded-full h-5 w-5 flex items-center justify-center`}>
+                                    {itemCount}
+                                </span>
+                            )}
+                        </button>
                     </div>
 
                     {/* Mobile Menu Button */}
