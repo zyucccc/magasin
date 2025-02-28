@@ -56,12 +56,12 @@ export default function Home() {
                         </p>
 
                         <div className="flex space-x-4">
-                            <button className="bg-black text-white px-6 py-3 hover:bg-gray-800 transition-colors">
+                            <Link href="/frontend/src/app/shop_all" className="bg-black text-white px-6 py-3 hover:bg-gray-800 transition-colors inline-block">
                                 Shop Now
-                            </button>
-                            <button className="border border-black px-6 py-3 hover:bg-gray-100 transition-colors text-black">
+                            </Link>
+                            <Link href="/frontend/src/app/shop_all" className="border border-black px-6 py-3 hover:bg-gray-100 transition-colors text-black inline-block">
                                 Learn More
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 </div>

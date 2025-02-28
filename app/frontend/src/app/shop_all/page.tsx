@@ -43,7 +43,7 @@ export default function ShopAll() {
                }
                const products_results = await response.json();
                 setProducts(products_results);
-                setFilteredProducts(products);
+                setFilteredProducts(products_results);
             }catch (error){
                 console.error('Error fetching products:', error);
             }finally {
@@ -305,8 +305,12 @@ export default function ShopAll() {
 
                         {/*products list*/}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {filteredProducts.map((product) => (
-                                <div key={product.id} className="group border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-300">
+                            {currentProducts.map((product) => (
+                                <Link
+                                    href={`/frontend/src/app/product_detail/${product.id}`}
+                                    key={product.id}
+                                    className="group border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow duration-300"
+                                >
                                     <div className="relative mb-2 aspect-square overflow-hidden bg-gray-100">
                                         {product.onSale && (
                                             <div className="absolute top-2 left-2 bg-red-100 text-red-700 px-2 py-1 text-xs font-medium rounded">
@@ -351,7 +355,7 @@ export default function ShopAll() {
                                             )}
                                         </div>
                                     </div>
-                                </div>
+                                </Link>
                             ))}
                         </div>
                         {/* Pagination */}

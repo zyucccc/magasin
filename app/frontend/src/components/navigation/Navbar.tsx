@@ -10,7 +10,8 @@ export default function Navbar({ theme }: NavbarProps) {
     const [mouse_on_Link, set_mouse_on_link] = useState('/init')
     const pathname = usePathname()
 
-    const autoTheme = pathname === '/frontend/src/app/shop_all' ? 'light' : 'dark'
+    const in_light_mode = pathname === '/frontend/src/app/shop_all' || pathname.startsWith('/frontend/src/app/product_detail/')
+    const autoTheme = in_light_mode ? 'light' : 'dark'
     const currentTheme = theme || autoTheme
 
     // set the color of the text and underline based on the current theme
