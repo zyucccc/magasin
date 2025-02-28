@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { X, Plus, Minus } from 'lucide-react';
@@ -186,13 +188,13 @@ const Cart = () => {
                             <span className="text-2xl font-medium text-black">${subtotal.toFixed(2)} CAD</span>
                         </div>
 
-                        <button className="w-full bg-black text-white py-3 font-medium mb-3">
+                        <Link href="/frontend/src/app/checkout" className="block w-full bg-black text-white py-3 font-medium mb-3 text-center">
                             CHECK OUT
-                        </button>
+                        </Link>
 
-                        <button className="w-full border border-black py-3 font-medium text-black">
-                            VIEW CART
-                        </button>
+                        {/*<button className="w-full border border-black py-3 font-medium text-black">*/}
+                        {/*    VIEW CART*/}
+                        {/*</button>*/}
 
                         <p className="text-sm text-gray-500 mt-4">
                             Shipping, taxes, and discount codes are calculated at checkout

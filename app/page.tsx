@@ -4,7 +4,6 @@ import Carousel from "@/app/frontend/src/components/carousel/Carousel";
 import Footer from "@/app/frontend/src/components/footer/Footer";
 import Link from "next/link";
 
-import { CartProvider } from "@/app/frontend/src/components/cart/CartContext";
 import Cart from "@/app/frontend/src/components/cart/Cart";
 // npm run dev
 
@@ -12,7 +11,6 @@ export default function Home() {
 
     return (
         <div className="bg-gray-50 w-full min-h-screen">
-            <CartProvider>
             {/*navbar*/}
                 <Navbar/>
                 <Cart />
@@ -75,7 +73,6 @@ export default function Home() {
 
             {/*footer*/}
             <Footer/>
-            </CartProvider>
         </div>
     );
 }

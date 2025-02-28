@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Navbar from "@/app/frontend/src/components/navigation/Navbar";
 import Footer from "@/app/frontend/src/components/footer/Footer";
 import { ProductDetail, Product, Size } from '@/app/interfaces/interfaces';
-import {CartProvider,useCart} from '@//app/frontend/src/components/cart/CartContext';
+import {useCart} from '@//app/frontend/src/components/cart/CartContext';
 import Cart from '@/app/frontend/src/components/cart/Cart';
 
 
@@ -73,7 +73,7 @@ export default function ProductDetailPage() {
                 onClick={() => {
                     if(onValidate()){
                         addToCart(product, quantity, selectedSize.name);
-                        alert(`Added to cart: ${product.name}, Size: ${selectedSize.name}, number: ${quantity}`);
+                        // alert(`Added to cart: ${product.name}, Size: ${selectedSize.name}, number: ${quantity}`);
                     }
                 }}
                 disabled={!isInStock || !selectedSize}
@@ -88,19 +88,18 @@ export default function ProductDetailPage() {
         );
     }
 
-    // 处理数量变更
     const handleQuantityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setQuantity(parseInt(e.target.value, 10));
     };
 
-    // 处理尺码选择
+    // size select
     const handleSizeSelect = (size: Size) => {
         if (size.inStock) {
             setSelectedSize(size);
         }
     };
 
-    // 加入购物车
+    // validate cart addition
     const validateCartAddition = () => {
         if (!product || !selectedSize) {
             alert('Please choose the size');
@@ -112,10 +111,8 @@ export default function ProductDetailPage() {
     if (loading) {
         return (
             <div className="bg-white w-full min-h-screen">
-                <CartProvider>
                 <Navbar theme="light" />
                 <div className="container mx-auto px-4 py-16 pt-24 text-gray-800">Loading...</div>
-                </CartProvider>
                 <Footer />
             </div>
         );
@@ -124,7 +121,6 @@ export default function ProductDetailPage() {
     if (!product) {
         return (
             <div className="bg-white w-full min-h-screen">
-                <CartProvider>
                 <Navbar />
                 <div className="container mx-auto px-4 py-16 pt-24 text-gray-800">
                     <h1 className="text-2xl font-bold mb-4">product not found</h1>
@@ -132,7 +128,6 @@ export default function ProductDetailPage() {
                         return to shop
                     </Link>
                 </div>
-                </CartProvider>
                 <Footer />
             </div>
         );
@@ -140,10 +135,8 @@ export default function ProductDetailPage() {
 
     return (
         <div className="bg-white w-full min-h-screen">
-            <CartProvider>
             <Navbar />
             <Cart />
-            {/* 面包屑导航 */}
             <div className="container mx-auto px-4 py-4 pt-20 text-sm">
                 <nav className="flex" aria-label="Breadcrumb">
                     <ol className="inline-flex items-center space-x-1 md:space-x-3">
@@ -400,7 +393,6 @@ export default function ProductDetailPage() {
                     </div>
                 )}
             </div>
-            </CartProvider>
             <Footer />
         </div>
     );

@@ -25,12 +25,13 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     const [subtotal, setSubtotal] = useState(0);
     const [itemCount, setItemCount] = useState(0);
     const [freeShippingQualified, setFreeShippingQualified] = useState(false);
-    const freeShippingThreshold = 160; // 免运费阈值
+    const freeShippingThreshold = 160;
 
-    // 从localStorage加载购物车
+    // load cart from localStorage
     useEffect(() => {
         const savedCart = localStorage.getItem('cart');
-        if (savedCart) {
+        console.log('load cart from localStorage:', savedCart);
+        if (savedCart && savedCart !== '[]') {
             try {
                 const parsedCart = JSON.parse(savedCart);
                 setCartItems(parsedCart);
@@ -40,7 +41,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         }
     }, []);
 
-    // 计算小计和商品数量
+    // calculate subtotal and item count
     useEffect(() => {
         const total = cartItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
         const count = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -49,39 +50,39 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         setItemCount(count);
         setFreeShippingQualified(total >= freeShippingThreshold);
 
-        // 保存到localStorage
+        // save cart to localStorage
         localStorage.setItem('cart', JSON.stringify(cartItems));
+        // console.log('update to localStorage:', JSON.stringify(cartItems));
     }, [cartItems, freeShippingThreshold]);
 
-    // 添加商品到购物车
+    // add product to cart
     const addToCart = (product: Product, quantity: number, size: string) => {
         setCartItems(prevItems => {
-            // 检查是否已有相同商品和尺寸
+            // check if the product already exists in the cart
             const existingItemIndex = prevItems.findIndex(
                 item => item.product.id === product.id && item.size === size
             );
 
             if (existingItemIndex !== -1) {
-                // 如果已存在，更新数量
+                // if the product already exists in the cart, update the quantity
                 const updatedItems = [...prevItems];
                 updatedItems[existingItemIndex].quantity += quantity;
                 return updatedItems;
             } else {
-                // 如果不存在，添加新商品
                 return [...prevItems, { product, quantity, size }];
             }
         });
 
-        // 添加商品后自动打开购物车
+        // after adding product to cart, open cart
         setIsCartOpen(true);
     };
 
-    // 从购物车移除商品
+    // remove product from cart
     const removeFromCart = (index: number) => {
         setCartItems(prevItems => prevItems.filter((_, i) => i !== index));
     };
 
-    // 更新商品数量
+    // update product quantity
     const updateQuantity = (index: number, quantity: number) => {
         if (quantity < 1) return;
 
@@ -98,12 +99,11 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         setIsCartOpen(true);
     };
 
-    // 关闭购物车
     const closeCart = () => {
         setIsCartOpen(false);
     };
 
-    // 清空购物车
+    // clear Cart
     const clearCart = () => {
         setCartItems([]);
     };

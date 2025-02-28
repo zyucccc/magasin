@@ -9,7 +9,6 @@ import Link from 'next/link';
 import { X } from 'lucide-react';
 // cart
 import Cart from '@/app/frontend/src/components/cart/Cart';
-import { CartProvider } from '@//app/frontend/src/components/cart/CartContext';
 
 export default function ShopAll() {
     const [products, setProducts] = useState<Product[]>([]);
@@ -166,7 +165,6 @@ export default function ShopAll() {
 
     return (
         <div className="bg-white w-full min-h-screen">
-            <CartProvider>
             <Navbar />
             <Cart/>
             <div className="container mx-auto px-4 py-8 pt-20">
@@ -414,7 +412,6 @@ export default function ShopAll() {
                 </div>
             </div>
             <Footer />
-            </CartProvider>
         </div>
     );
 }

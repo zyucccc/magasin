@@ -16,7 +16,7 @@ export default function Navbar({ theme }: NavbarProps) {
     // hook cart
     const { openCart, itemCount } = useCart()
 
-    const in_light_mode = pathname === '/frontend/src/app/shop_all' || pathname.startsWith('/frontend/src/app/product_detail/')
+    const in_light_mode = pathname === '/frontend/src/app/shop_all' || '/frontend/src/app/checkout' || pathname === '/frontend/src/app/about_us'|| pathname === '/frontend/src/app/contact' || pathname.startsWith('/frontend/src/app/product_detail/')
     const autoTheme = in_light_mode ? 'light' : 'dark'
     const currentTheme = theme || autoTheme
 
@@ -62,7 +62,7 @@ export default function Navbar({ theme }: NavbarProps) {
                             ></span>
                         </Link>
                         <Link
-                            href="/contact"
+                            href="/frontend/src/app/contact"
                             className={`relative uppercase ${textColor} ${hoverColor} px-3 py-2 group tracking-widest text-sm font-normal`}
                             onMouseEnter={() => set_mouse_on_link('/contact')}
                             onMouseLeave={() => set_mouse_on_link('/init')}
@@ -73,7 +73,7 @@ export default function Navbar({ theme }: NavbarProps) {
                             ></span>
                         </Link>
                         <Link
-                            href="/services"
+                            href="/frontend/src/app/about_us"
                             className={`relative uppercase ${textColor} ${hoverColor} px-3 py-2 group tracking-widest text-sm font-normal`}
                             onMouseEnter={() => set_mouse_on_link('/services')}
                             onMouseLeave={() => set_mouse_on_link('/init')}
