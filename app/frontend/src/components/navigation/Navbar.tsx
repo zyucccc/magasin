@@ -5,6 +5,9 @@ import { usePathname } from 'next/navigation'
 import { ShoppingBag } from 'lucide-react'
 import { useCart } from '@/app/frontend/src/components/cart/CartContext'
 
+import { User , LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useAuth } from '@/app/frontend/src/context/AuthContext';
 
 interface NavbarProps {
     theme?: 'light' | 'dark';
@@ -16,7 +19,10 @@ export default function Navbar({ theme }: NavbarProps) {
     // hook cart
     const { openCart, itemCount } = useCart()
 
-    const in_light_mode = pathname === '/frontend/src/app/shop_all' || '/frontend/src/app/checkout' || pathname === '/frontend/src/app/about_us'|| pathname === '/frontend/src/app/contact' || pathname.startsWith('/frontend/src/app/product_detail/')
+    const router = useRouter();
+    const { user, logout } = useAuth();
+
+    const in_light_mode = pathname === '/frontend/src/app/shop_all' || '/frontend/src/app/checkout' || pathname === '/frontend/src/app/about_us'|| pathname === '/frontend/src/app/contact' || pathname.startsWith('/frontend/src/app/product_detail/') || pathname === '/frontend/src/app/auth' 
     const autoTheme = in_light_mode ? 'light' : 'dark'
     const currentTheme = theme || autoTheme
 
@@ -83,10 +89,12 @@ export default function Navbar({ theme }: NavbarProps) {
                                 className={`absolute bottom-0 left-0 w-full h-0.5 ${underlineColor} transition-transform duration-300 ${mouse_on_Link === '/services' ? 'scale-x-100' : 'scale-x-0'} group-hover:scale-x-100 origin-left`}
                             ></span>
                         </Link>
+
                     </div>
 
+                    <div className="flex items-center space-x-4">
+                       
                     {/* cart */}
-                    <div className="flex items-center">
                         <button
                             onClick={() => {
                                 // console.log("click");
@@ -102,8 +110,23 @@ export default function Navbar({ theme }: NavbarProps) {
                                 </span>
                             )}
                         </button>
-                    </div>
-
+                        {user ? (
+                            <button
+                                onClick={() => {
+                                    logout();
+                                    router.push("/");
+                                }}
+                                className="text-red-500 p-2"
+                            >
+                                <LogOut size={24} />
+                            </button>
+                        ) : (
+                            <Link href="/frontend/src/app/auth" className="text-gray-700 p-2">
+                                <User size={24} />
+                            </Link>
+                        )}
+                    </div >
+                    
                     {/* Mobile Menu Button */}
                     <div className="sm:hidden">
                         <button className={textColor}>
