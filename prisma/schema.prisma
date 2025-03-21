@@ -3,23 +3,23 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
   id            Int        @id @default(autoincrement())
-  email         String     @unique(map: "email") @db.VarChar(255)
-  password      String     @db.VarChar(255)
-  nom           String     @db.VarChar(100)
-  prenom        String     @db.VarChar(100)
-  adresse       String?    @db.Text
-  code_postal   String?    @db.VarChar(20)
-  ville         String?    @db.VarChar(100)
-  pays          String?    @default("France") @db.VarChar(100)
-  telephone     String?    @db.VarChar(20)
+  email         String     @unique
+  password      String
+  nom           String
+  prenom        String
+  adresse       String?
+  code_postal   String?
+  ville         String?
+  pays          String?    @default("France")
+  telephone     String?
   is_admin      Boolean?   @default(false)
-  date_creation DateTime?  @default(now()) @db.DateTime(0)
+  date_creation DateTime?  @default(now()) @db.Timestamp(6)
   commandes     Commande[]
   paniers       Panier[]
 
@@ -28,8 +28,8 @@ model User {
 
 model Categorie {
   id          Int       @id @default(autoincrement())
-  nom         String    @db.VarChar(100)
-  description String?   @db.Text
+  nom         String
+  description String?
   articles    Article[]
 
   @@map("categorie")
@@ -37,22 +37,22 @@ model Categorie {
 
 model Article {
   id            Int        @id @default(autoincrement())
-  nom           String     @db.VarChar(255)
+  nom           String
   prix          Decimal    @db.Decimal(10, 2)
-  description   String?    @db.Text
-  image         String?    @db.VarChar(255)
+  description   String?
+  image         String?
   categorie_id  Int?
-  date_creation DateTime?  @default(now()) @db.DateTime(0)
-  categorie     Categorie? @relation(fields: [categorie_id], references: [id], onUpdate: NoAction, map: "article_ibfk_1")
+  date_creation DateTime?  @default(now()) @db.Timestamp(6)
+  categorie     Categorie? @relation(fields: [categorie_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
   stocks        Stock[]
 
-  @@index([categorie_id], map: "categorie_id")
+  @@index([categorie_id], map: "article_categorie_id_idx")
   @@map("article")
 }
 
 model Taille {
   id     Int     @id @default(autoincrement())
-  nom    String  @db.VarChar(50)
+  nom    String
   stocks Stock[]
 
   @@map("taille")
@@ -64,22 +64,22 @@ model Stock {
   taille_id    Int
   quantite     Int          @default(0)
   panier_items PanierItem[]
-  article      Article      @relation(fields: [article_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "stock_ibfk_1")
-  taille       Taille       @relation(fields: [taille_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "stock_ibfk_2")
+  article      Article      @relation(fields: [article_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  taille       Taille       @relation(fields: [taille_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@unique([article_id, taille_id], name: "unique_article_taille", map: "unique_article_taille")
-  @@index([taille_id], map: "taille_id")
+  @@unique([article_id, taille_id], name: "unique_article_taille")
+  @@index([taille_id], map: "stock_taille_id_idx")
   @@map("stock")
 }
 
 model Panier {
   id            Int          @id @default(autoincrement())
   user_id       Int
-  date_creation DateTime?    @default(now()) @db.DateTime(0)
-  user          User         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "panier_ibfk_1")
+  date_creation DateTime?    @default(now()) @db.Timestamp(6)
+  user          User         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   items         PanierItem[]
 
-  @@index([user_id], map: "user_id")
+  @@index([user_id], map: "panier_user_id_idx")
   @@map("panier")
 }
 
@@ -88,19 +88,19 @@ model PanierItem {
   panier_id  Int
   stock_id   Int
   quantite   Int       @default(1)
-  date_ajout DateTime? @default(now()) @db.DateTime(0)
-  panier     Panier    @relation(fields: [panier_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "panier_item_ibfk_1")
-  stock      Stock     @relation(fields: [stock_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "panier_item_ibfk_2")
+  date_ajout DateTime? @default(now()) @db.Timestamp(6)
+  panier     Panier    @relation(fields: [panier_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  stock      Stock     @relation(fields: [stock_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@index([panier_id], map: "panier_id")
-  @@index([stock_id], map: "stock_id")
+  @@index([panier_id], map: "panier_item_panier_id_idx")
+  @@index([stock_id], map: "panier_item_stock_id_idx")
   @@map("panier_item")
 }
 
 model StatutCommande {
   id          Int        @id @default(autoincrement())
-  nom         String     @db.VarChar(50)
-  description String?    @db.Text
+  nom         String
+  description String?
   commandes   Commande[]
 
   @@map("statut_commande")
@@ -109,150 +109,282 @@ model StatutCommande {
 model Commande {
   id                    Int            @id @default(autoincrement())
   user_id               Int
-  reference             String         @unique(map: "reference") @db.VarChar(50)
+  reference             String         @unique
   total                 Decimal        @db.Decimal(10, 2)
   statut_id             Int
-  adresse_livraison     String         @db.Text
-  code_postal_livraison String         @db.VarChar(20)
-  ville_livraison       String         @db.VarChar(100)
-  pays_livraison        String         @default("France") @db.VarChar(100)
-  telephone_livraison   String?        @db.VarChar(20)
-  date_commande         DateTime?      @default(now()) @db.DateTime(0)
-  user                  User           @relation(fields: [user_id], references: [id], onUpdate: NoAction, map: "commande_ibfk_1")
-  statut                StatutCommande @relation(fields: [statut_id], references: [id], onUpdate: NoAction, map: "commande_ibfk_2")
+  adresse_livraison     String
+  code_postal_livraison String
+  ville_livraison       String
+  pays_livraison        String         @default("France")
+  telephone_livraison   String?
+  date_commande         DateTime?      @default(now()) @db.Timestamp(6)
+  user                  User           @relation(fields: [user_id], references: [id], onUpdate: NoAction)
+  statut                StatutCommande @relation(fields: [statut_id], references: [id], onUpdate: NoAction)
 
-  @@index([statut_id], map: "statut_id")
-  @@index([user_id], map: "user_id")
+  @@index([statut_id], map: "commande_statut_id_idx")
+  @@index([user_id], map: "commande_user_id_idx")
   @@map("commande")
 }
-
-// Mysql
-// -- 创建数据库
-// CREATE DATABASE IF NOT EXISTS magasin;
-// USE magasin;
+// generator client {
+//   provider = "prisma-client-js"
+// }
 //
-// -- 用户表
-// CREATE TABLE user (
-// id INT AUTO_INCREMENT PRIMARY KEY,
-// email VARCHAR(255) NOT NULL UNIQUE,
-// password VARCHAR(255) NOT NULL,
-// nom VARCHAR(100) NOT NULL,
-// prenom VARCHAR(100) NOT NULL,
-// adresse TEXT,
-// code_postal VARCHAR(20),
-// ville VARCHAR(100),
-// pays VARCHAR(100) DEFAULT 'France',
-// telephone VARCHAR(20),
-// is_admin BOOLEAN DEFAULT FALSE,
-// date_creation DATETIME DEFAULT CURRENT_TIMESTAMP
-// );
+// // datasource db {
+// //   provider = "mysql"
+// //   url      = env("DATABASE_URL")
+// // }
 //
-// -- 商品分类表
-// CREATE TABLE categorie (
-// id INT AUTO_INCREMENT PRIMARY KEY,
-// nom VARCHAR(100) NOT NULL,
-// description TEXT
-// );
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
 //
-// -- 商品表
-// CREATE TABLE article (
-// id INT AUTO_INCREMENT PRIMARY KEY,
-// nom VARCHAR(255) NOT NULL,
-// prix DECIMAL(10, 2) NOT NULL,
-// description TEXT,
-// image VARCHAR(255),
-// categorie_id INT,
-// date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
-// FOREIGN KEY (categorie_id) REFERENCES categorie(id) ON DELETE SET NULL
-// );
+// model User {
+//   id            Int        @id @default(autoincrement())
+//   email         String     @unique(map: "email") @db.VarChar(255)
+//   password      String     @db.VarChar(255)
+//   nom           String     @db.VarChar(100)
+//   prenom        String     @db.VarChar(100)
+//   adresse       String?    @db.Text
+//   code_postal   String?    @db.VarChar(20)
+//   ville         String?    @db.VarChar(100)
+//   pays          String?    @default("France") @db.VarChar(100)
+//   telephone     String?    @db.VarChar(20)
+//   is_admin      Boolean?   @default(false)
+//   date_creation DateTime?  @default(now()) @db.DateTime(0)
+//   commandes     Commande[]
+//   paniers       Panier[]
 //
-// -- 尺寸选项表
-// CREATE TABLE taille (
-// id INT AUTO_INCREMENT PRIMARY KEY,
-// nom VARCHAR(50) NOT NULL
-// );
+//   @@map("user")
+// }
 //
-// -- 商品库存表 (关联商品和尺寸)
-// CREATE TABLE stock (
-// id INT AUTO_INCREMENT PRIMARY KEY,
-// article_id INT NOT NULL,
-// taille_id INT NOT NULL,
-// quantite INT NOT NULL DEFAULT 0,
-// FOREIGN KEY (article_id) REFERENCES article(id) ON DELETE CASCADE,
-// FOREIGN KEY (taille_id) REFERENCES taille(id) ON DELETE CASCADE,
-// UNIQUE KEY unique_article_taille (article_id, taille_id)
-// );
+// model Categorie {
+//   id          Int       @id @default(autoincrement())
+//   nom         String    @db.VarChar(100)
+//   description String?   @db.Text
+//   articles    Article[]
 //
-// -- 购物车表
-// CREATE TABLE panier (
-// id INT AUTO_INCREMENT PRIMARY KEY,
-// user_id INT NOT NULL,
-// date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
-// FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
-// );
+//   @@map("categorie")
+// }
 //
-// -- 购物车详情表
-// CREATE TABLE panier_item (
-// id INT AUTO_INCREMENT PRIMARY KEY,
-// panier_id INT NOT NULL,
-// stock_id INT NOT NULL,
-// quantite INT NOT NULL DEFAULT 1,
-// date_ajout DATETIME DEFAULT CURRENT_TIMESTAMP,
-// FOREIGN KEY (panier_id) REFERENCES panier(id) ON DELETE CASCADE,
-// FOREIGN KEY (stock_id) REFERENCES stock(id) ON DELETE CASCADE
-// );
+// model Article {
+//   id            Int        @id @default(autoincrement())
+//   nom           String     @db.VarChar(255)
+//   prix          Decimal    @db.Decimal(10, 2)
+//   description   String?    @db.Text
+//   image         String?    @db.VarChar(255)
+//   categorie_id  Int?
+//   date_creation DateTime?  @default(now()) @db.DateTime(0)
+//   categorie     Categorie? @relation(fields: [categorie_id], references: [id], onUpdate: NoAction, map: "article_ibfk_1")
+//   stocks        Stock[]
 //
-// -- 订单状态表
-// CREATE TABLE statut_commande (
-// id INT AUTO_INCREMENT PRIMARY KEY,
-// nom VARCHAR(50) NOT NULL,
-// description TEXT
-// );
+//   @@index([categorie_id], map: "categorie_id")
+//   @@map("article")
+// }
 //
-// -- 订单表
-// CREATE TABLE commande (
-// id INT AUTO_INCREMENT PRIMARY KEY,
-// user_id INT NOT NULL,
-// reference VARCHAR(50) NOT NULL UNIQUE,
-// total DECIMAL(10, 2) NOT NULL,
-// statut_id INT NOT NULL,
-// adresse_livraison TEXT NOT NULL,
-// code_postal_livraison VARCHAR(20) NOT NULL,
-// ville_livraison VARCHAR(100) NOT NULL,
-// pays_livraison VARCHAR(100) NOT NULL DEFAULT 'France',
-// telephone_livraison VARCHAR(20),
-// date_commande DATETIME DEFAULT CURRENT_TIMESTAMP,
-// FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE RESTRICT,
-// FOREIGN KEY (statut_id) REFERENCES statut_commande(id) ON DELETE RESTRICT
-// );
+// model Taille {
+//   id     Int     @id @default(autoincrement())
+//   nom    String  @db.VarChar(50)
+//   stocks Stock[]
 //
-// -- 订单详情表
-// CREATE TABLE commande_detail (
-// id INT AUTO_INCREMENT PRIMARY KEY,
-// commande_id INT NOT NULL,
-// article_id INT NOT NULL,
-// taille_id INT NOT NULL,
-// prix_unitaire DECIMAL(10, 2) NOT NULL,
-// quantite INT NOT NULL,
-// FOREIGN KEY (commande_id) REFERENCES commande(id) ON DELETE CASCADE,
-// FOREIGN KEY (article_id) REFERENCES article(id) ON DELETE RESTRICT,
-// FOREIGN KEY (taille_id) REFERENCES taille(id) ON DELETE RESTRICT
-// );
+//   @@map("taille")
+// }
 //
-// -- 插入订单状态数据
-// INSERT INTO statut_commande (nom, description) VALUES
-// ('En attente', 'Commande en attente de traitement'),
-// ('Confirmée', 'Commande confirmée'),
-// ('En préparation', 'Commande en cours de préparation'),
-// ('Expédiée', 'Commande expédiée'),
-// ('Livrée', 'Commande livrée'),
-// ('Annulée', 'Commande annulée');
+// model Stock {
+//   id           Int          @id @default(autoincrement())
+//   article_id   Int
+//   taille_id    Int
+//   quantite     Int          @default(0)
+//   panier_items PanierItem[]
+//   article      Article      @relation(fields: [article_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "stock_ibfk_1")
+//   taille       Taille       @relation(fields: [taille_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "stock_ibfk_2")
 //
-// -- 插入基本尺寸数据
-// INSERT INTO taille (nom) VALUES
-// ('XS'),
-// ('S'),
-// ('M'),
-// ('L'),
-// ('XL'),
-// ('XXL');
+//   @@unique([article_id, taille_id], name: "unique_article_taille", map: "unique_article_taille")
+//   @@index([taille_id], map: "taille_id")
+//   @@map("stock")
+// }
+//
+// model Panier {
+//   id            Int          @id @default(autoincrement())
+//   user_id       Int
+//   date_creation DateTime?    @default(now()) @db.DateTime(0)
+//   user          User         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "panier_ibfk_1")
+//   items         PanierItem[]
+//
+//   @@index([user_id], map: "user_id")
+//   @@map("panier")
+// }
+//
+// model PanierItem {
+//   id         Int       @id @default(autoincrement())
+//   panier_id  Int
+//   stock_id   Int
+//   quantite   Int       @default(1)
+//   date_ajout DateTime? @default(now()) @db.DateTime(0)
+//   panier     Panier    @relation(fields: [panier_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "panier_item_ibfk_1")
+//   stock      Stock     @relation(fields: [stock_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "panier_item_ibfk_2")
+//
+//   @@index([panier_id], map: "panier_id")
+//   @@index([stock_id], map: "stock_id")
+//   @@map("panier_item")
+// }
+//
+// model StatutCommande {
+//   id          Int        @id @default(autoincrement())
+//   nom         String     @db.VarChar(50)
+//   description String?    @db.Text
+//   commandes   Commande[]
+//
+//   @@map("statut_commande")
+// }
+//
+// model Commande {
+//   id                    Int            @id @default(autoincrement())
+//   user_id               Int
+//   reference             String         @unique(map: "reference") @db.VarChar(50)
+//   total                 Decimal        @db.Decimal(10, 2)
+//   statut_id             Int
+//   adresse_livraison     String         @db.Text
+//   code_postal_livraison String         @db.VarChar(20)
+//   ville_livraison       String         @db.VarChar(100)
+//   pays_livraison        String         @default("France") @db.VarChar(100)
+//   telephone_livraison   String?        @db.VarChar(20)
+//   date_commande         DateTime?      @default(now()) @db.DateTime(0)
+//   user                  User           @relation(fields: [user_id], references: [id], onUpdate: NoAction, map: "commande_ibfk_1")
+//   statut                StatutCommande @relation(fields: [statut_id], references: [id], onUpdate: NoAction, map: "commande_ibfk_2")
+//
+//   @@index([statut_id], map: "statut_id")
+//   @@index([user_id], map: "user_id")
+//   @@map("commande")
+// }
+//
+// // Mysql
+// // -- 创建数据库
+// // CREATE DATABASE IF NOT EXISTS magasin;
+// // USE magasin;
+// //
+// // -- 用户表
+// // CREATE TABLE user (
+// // id INT AUTO_INCREMENT PRIMARY KEY,
+// // email VARCHAR(255) NOT NULL UNIQUE,
+// // password VARCHAR(255) NOT NULL,
+// // nom VARCHAR(100) NOT NULL,
+// // prenom VARCHAR(100) NOT NULL,
+// // adresse TEXT,
+// // code_postal VARCHAR(20),
+// // ville VARCHAR(100),
+// // pays VARCHAR(100) DEFAULT 'France',
+// // telephone VARCHAR(20),
+// // is_admin BOOLEAN DEFAULT FALSE,
+// // date_creation DATETIME DEFAULT CURRENT_TIMESTAMP
+// // );
+// //
+// // -- 商品分类表
+// // CREATE TABLE categorie (
+// // id INT AUTO_INCREMENT PRIMARY KEY,
+// // nom VARCHAR(100) NOT NULL,
+// // description TEXT
+// // );
+// //
+// // -- 商品表
+// // CREATE TABLE article (
+// // id INT AUTO_INCREMENT PRIMARY KEY,
+// // nom VARCHAR(255) NOT NULL,
+// // prix DECIMAL(10, 2) NOT NULL,
+// // description TEXT,
+// // image VARCHAR(255),
+// // categorie_id INT,
+// // date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
+// // FOREIGN KEY (categorie_id) REFERENCES categorie(id) ON DELETE SET NULL
+// // );
+// //
+// // -- 尺寸选项表
+// // CREATE TABLE taille (
+// // id INT AUTO_INCREMENT PRIMARY KEY,
+// // nom VARCHAR(50) NOT NULL
+// // );
+// //
+// // -- 商品库存表 (关联商品和尺寸)
+// // CREATE TABLE stock (
+// // id INT AUTO_INCREMENT PRIMARY KEY,
+// // article_id INT NOT NULL,
+// // taille_id INT NOT NULL,
+// // quantite INT NOT NULL DEFAULT 0,
+// // FOREIGN KEY (article_id) REFERENCES article(id) ON DELETE CASCADE,
+// // FOREIGN KEY (taille_id) REFERENCES taille(id) ON DELETE CASCADE,
+// // UNIQUE KEY unique_article_taille (article_id, taille_id)
+// // );
+// //
+// // -- 购物车表
+// // CREATE TABLE panier (
+// // id INT AUTO_INCREMENT PRIMARY KEY,
+// // user_id INT NOT NULL,
+// // date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
+// // FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+// // );
+// //
+// // -- 购物车详情表
+// // CREATE TABLE panier_item (
+// // id INT AUTO_INCREMENT PRIMARY KEY,
+// // panier_id INT NOT NULL,
+// // stock_id INT NOT NULL,
+// // quantite INT NOT NULL DEFAULT 1,
+// // date_ajout DATETIME DEFAULT CURRENT_TIMESTAMP,
+// // FOREIGN KEY (panier_id) REFERENCES panier(id) ON DELETE CASCADE,
+// // FOREIGN KEY (stock_id) REFERENCES stock(id) ON DELETE CASCADE
+// // );
+// //
+// // -- 订单状态表
+// // CREATE TABLE statut_commande (
+// // id INT AUTO_INCREMENT PRIMARY KEY,
+// // nom VARCHAR(50) NOT NULL,
+// // description TEXT
+// // );
+// //
+// // -- 订单表
+// // CREATE TABLE commande (
+// // id INT AUTO_INCREMENT PRIMARY KEY,
+// // user_id INT NOT NULL,
+// // reference VARCHAR(50) NOT NULL UNIQUE,
+// // total DECIMAL(10, 2) NOT NULL,
+// // statut_id INT NOT NULL,
+// // adresse_livraison TEXT NOT NULL,
+// // code_postal_livraison VARCHAR(20) NOT NULL,
+// // ville_livraison VARCHAR(100) NOT NULL,
+// // pays_livraison VARCHAR(100) NOT NULL DEFAULT 'France',
+// // telephone_livraison VARCHAR(20),
+// // date_commande DATETIME DEFAULT CURRENT_TIMESTAMP,
+// // FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE RESTRICT,
+// // FOREIGN KEY (statut_id) REFERENCES statut_commande(id) ON DELETE RESTRICT
+// // );
+// //
+// // -- 订单详情表
+// // CREATE TABLE commande_detail (
+// // id INT AUTO_INCREMENT PRIMARY KEY,
+// // commande_id INT NOT NULL,
+// // article_id INT NOT NULL,
+// // taille_id INT NOT NULL,
+// // prix_unitaire DECIMAL(10, 2) NOT NULL,
+// // quantite INT NOT NULL,
+// // FOREIGN KEY (commande_id) REFERENCES commande(id) ON DELETE CASCADE,
+// // FOREIGN KEY (article_id) REFERENCES article(id) ON DELETE RESTRICT,
+// // FOREIGN KEY (taille_id) REFERENCES taille(id) ON DELETE RESTRICT
+// // );
+// //
+// // -- 插入订单状态数据
+// // INSERT INTO statut_commande (nom, description) VALUES
+// // ('En attente', 'Commande en attente de traitement'),
+// // ('Confirmée', 'Commande confirmée'),
+// // ('En préparation', 'Commande en cours de préparation'),
+// // ('Expédiée', 'Commande expédiée'),
+// // ('Livrée', 'Commande livrée'),
+// // ('Annulée', 'Commande annulée');
+// //
+// // -- 插入基本尺寸数据
+// // INSERT INTO taille (nom) VALUES
+// // ('XS'),
+// // ('S'),
+// // ('M'),
+// // ('L'),
+// // ('XL'),
+// // ('XXL');

@@ -8,12 +8,13 @@ import Footer from "@/app/frontend/src/components/footer/Footer";
 import Cart from "@/app/frontend/src/components/cart/Cart";
 
 export default function RegisterPage() {
-  const [nom, setNom] = useState("");
-  const [prenom, setPrenom] = useState("");
+  const [, setNom] = useState("");
+    // const [nom, setNom] = useState("");
+  const [, setPrenom] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [adresse, setAdresse] = useState("");
-  const [telephone, setTelephone] = useState("");
+  const [, setPassword] = useState("");
+  const [, setAdresse] = useState("");
+  const [, setTelephone] = useState("");
 
   const { register } = useAuth();
   const router = useRouter();
@@ -103,7 +104,7 @@ export default function RegisterPage() {
               type="submit"
               className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800 transition"
             >
-              S'inscrire
+                {"S'inscrire"}
             </button>
           </form>
 

@@ -2,7 +2,7 @@ import useEmblaCarousel from 'embla-carousel-react'
 import Image from "next/image";
 
 export default function Carousel() {
-    // @ts-ignore
+    // @ts-expect-error - description
     const [emblaRef] = useEmblaCarousel({loop: true, autoplay: true, speed: 10})
 
     return (

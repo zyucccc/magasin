@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import Navbar from "@/app/frontend/src/components/navigation/Navbar";
 import Footer from "@/app/frontend/src/components/footer/Footer";
 import Cart from '@/app/frontend/src/components/cart/Cart';
@@ -23,9 +22,9 @@ export default function AboutUsPage() {
                             </p>
 
                             <p className="text-lg text-gray-700 mb-6">
-                                Inspired by the natural energy and beauty of Earth's minerals,
-                                we carefully select and offer a diverse collection of premium crystals
-                                and elegant crystal jewelry to enhance your spiritual journey and living space.
+                                {"Inspired by the natural energy and beauty of Earth's minerals,"+
+                                "we carefully select and offer a diverse collection of premium crystals"+
+                                "and elegant crystal jewelry to enhance your spiritual journey and living space."}
                             </p>
 
                             <p className="text-lg text-gray-700 mb-8">
@@ -75,7 +74,7 @@ export default function AboutUsPage() {
                             </div>
                             <div className="bg-gray-50 p-6 rounded-lg">
                                 <h3 className="text-lg font-medium mb-3 text-black">Community</h3>
-                                <p className="text-gray-700">We're building a community of crystal enthusiasts, offering resources, events, and a space to share experiences and knowledge.</p>
+                                <p className="text-gray-700">We are building a community of crystal enthusiasts, offering resources, events, and a space to share experiences and knowledge.</p>
                             </div>
                         </div>
                     </div>

@@ -27,6 +27,15 @@ export interface CartContextType {
     clearCart: () => void;
 }
 
+export interface OrderSummary {
+    items: CartItem[];
+    subtotal: number;
+    shipping: number;
+    tax: number;
+    total: number;
+}
+
+
 //DB interface
 export interface Size {
     id: number;

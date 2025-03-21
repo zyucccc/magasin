@@ -1,5 +1,5 @@
 'use client';
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react';
 import Navbar from "@/app/frontend/src/components/navigation/Navbar";
 import Footer from "@/app/frontend/src/components/footer/Footer";
@@ -14,7 +14,7 @@ export default function ContactPage() {
         inquiryType: 'General Inquires'
     });
 
-    const handleChange = (e: { target: { name: any; value: any; type: any; checked: any; }; }) => {
+    const handleChange = (e: any) => {
         const { name, value, type, checked } = e.target;
         setFormData(prev => ({
             ...prev,
@@ -37,10 +37,10 @@ export default function ContactPage() {
                     <h1 className="text-3xl font-medium text-gray-900">Contact</h1>
                 </div>
 
-                {/* 联系表单 */}
+                {/* formulaire */}
                 <div className="container mx-auto px-4 max-w-xl pb-20">
                     <form onSubmit={handleSubmit}>
-                        {/* 全名 */}
+                        {/* fullname */}
                         <div className="mb-6">
                             <label htmlFor="fullName" className="block text-gray-700 mb-2">Full Name</label>
                             <input

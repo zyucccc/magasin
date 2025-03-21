@@ -1,12 +1,23 @@
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 import { getProductById, getRelatedProducts } from '@/app/backend/controllers/productController';
 
 export async function GET(
-    request: Request,
-    { params }: { params: { id: string } }
+    request: NextRequest,
+    // { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const productId = parseInt(params.id, 10);
+        // const id = params?.id;
+        const { id } = await params;
+        if (!id) {
+            return NextResponse.json(
+                { error: 'Missing product ID' },
+                { status: 400 }
+            );
+        }
+
+        const productId = parseInt(id, 10);
 
         if (isNaN(productId)) {
             return NextResponse.json(

@@ -9,7 +9,8 @@ import Cart from "@/app/frontend/src/components/cart/Cart";
 
 export default function AuthPage() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [, setPassword] = useState("");
+    // const [password, setPassword] = useState("");
   const { login } = useAuth();
   const router = useRouter();
 

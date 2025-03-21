@@ -41,13 +41,13 @@ export default function ProductDetailPage() {
                 const productData = await response.json();
                 setProduct(productData);
 
-                // 如果有库存的尺码，默认选择第一个有库存的尺码
+                // set default size
                 const inStockSize = productData.sizes.find((size: Size) => size.inStock);
                 if (inStockSize) {
                     setSelectedSize(inStockSize);
                 }
 
-                // 获取相关产品
+                // get product related
                 const relatedResponse = await fetch(`/api/products?id=${productId}&related=true`);
                 if (relatedResponse.ok) {
                     const relatedData = await relatedResponse.json();

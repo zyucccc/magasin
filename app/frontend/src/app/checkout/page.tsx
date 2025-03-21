@@ -1,13 +1,14 @@
 'use client';
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Navbar from "@/app/frontend/src/components/navigation/Navbar";
 import Footer from "@/app/frontend/src/components/footer/Footer";
+import {CartItem , OrderSummary} from "@/app/interfaces/interfaces";
 
 export default function CheckoutPage() {
-    const [step, setStep] = useState(1); // 1: 地址, 2: 邮递方式, 3: 支付
+    const [step, setStep] = useState(1); // 1: address, 2: delivery, 3: payment
     const [formData, setFormData] = useState({
         email: '',
         firstName: '',
@@ -29,7 +30,14 @@ export default function CheckoutPage() {
         receiveNews: false
     });
 
-    const [orderSummary, setOrderSummary] = useState({
+    // const [orderSummary, setOrderSummary] = useState({
+    //     items: [],
+    //     subtotal: 0,
+    //     shipping: 25.00,
+    //     tax: 0,
+    //     total: 0
+    // });
+    const [orderSummary, setOrderSummary] = useState<OrderSummary>({
         items: [],
         subtotal: 0,
         shipping: 25.00,
@@ -37,7 +45,7 @@ export default function CheckoutPage() {
         total: 0
     });
 
-    // 从localStorage加载购物车数据
+    // load cart from localStorage
     useEffect(() => {
         const loadCartFromStorage = () => {
             try {
@@ -45,14 +53,14 @@ export default function CheckoutPage() {
                 if (savedCart) {
                     const cartItems = JSON.parse(savedCart);
 
-                    // 计算小计
-                    const subtotal = cartItems.reduce((sum, item) =>
+                    // somme des articles
+                    const subtotal = cartItems.reduce((sum:number, item:CartItem) =>
                         sum + (item.product.price * item.quantity), 0);
 
-                    // 计算税费 (假设为小计的5%)
+                    // taxes
                     const tax = subtotal * 0.05;
 
-                    // 计算总金额
+                    // somme total
                     const shipping = 25.00; // 默认运费
                     const total = subtotal + tax + (step >= 2 && formData.shippingMethod === 'standard' ? 0 : shipping);
 
@@ -72,7 +80,8 @@ export default function CheckoutPage() {
         loadCartFromStorage();
     }, [step, formData.shippingMethod]);
 
-    const handleChange = (e) => {
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    const handleChange = (e:any) => {
         const { name, value, type, checked } = e.target;
         setFormData({
             ...formData,
@@ -94,13 +103,12 @@ export default function CheckoutPage() {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        // 处理支付提交
-        alert('订单已提交，谢谢您的购买！');
-        // 清空购物车
+        // handle form submission
+        alert('Commande commited！');
+        // vide cart
         localStorage.removeItem('cart');
-        // 这里可以重定向到确认页面
     };
 
     const renderStepIndicator = () => (
@@ -115,14 +123,12 @@ export default function CheckoutPage() {
         </div>
     );
 
-
-    // @ts-ignore
     const renderOrderSummary = () => (
         <div className="bg-gray-50 p-6 rounded-md">
             <div className="flex justify-between items-center">
                 <div className="text-xl font-semibold text-black mb-6">
                     <Link href="/" className="block mb-4">
-                        <div className="text-2xl font-serif">yee-len.</div>
+                        <div className="text-2xl font-serif">MaiMai Christaux</div>
                         <div className="text-xs uppercase tracking-wide">GemStudio</div>
                     </Link>
                 </div>
@@ -219,7 +225,7 @@ export default function CheckoutPage() {
         </div>
     );
 
-    // 渲染地址表单
+    // address form
     const renderAddressForm = () => (
         <div>
             <h2 className="text-xl font-bold mb-6 text-black">Contact</h2>

@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import prisma from '@/prisma/prismaClient';
-
 // get all products
 export async function getAllProducts() {
     const articles = await prisma.article.findMany({
@@ -107,7 +107,7 @@ export async function getRelatedProducts(id: number, categoryId: number | null) 
     return relatedArticles.map(article => transformArticleToProduct(article));
 }
 
-// 辅助函数：转换数据库文章对象为前端产品对象
+// transfer db article to product
 function transformArticleToProduct(article: any, includeDetails: boolean = true) {
     // check stock
     const hasStock = article.stocks.some((stock: any) => stock.quantite > 0);
@@ -142,14 +142,13 @@ function transformArticleToProduct(article: any, includeDetails: boolean = true)
             description: article.description || '',
             categoryId: article.categorie_id,
             details: {
-                material: '优质材料',
-                dimensions: '标准尺寸',
-                care: '小心处理，避免撞击'
+                material: 'good materials',
+                dimensions: 'normal size',
+                care: 'careful to use'
             },
             features: [
-                '优质材料制作',
-                '经典设计，适合多种场合',
-                '耐用且舒适'
+                'producted with good materials',
+                'comfortable to wear'
             ]
         };
     }
