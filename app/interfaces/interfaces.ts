@@ -35,6 +35,20 @@ export interface OrderSummary {
     total: number;
 }
 
+//user interface
+export interface RegisterUserData {
+    email: string;
+    password: string;
+    nom: string;
+    prenom: string;
+    adresse?: string;
+    code_postal?: string;
+    ville?: string;
+    pays?: string;
+    telephone?: string;
+}
+
+
 
 //DB interface
 export interface Size {
@@ -57,7 +71,7 @@ export interface Product {
 
 export interface ProductDetail extends Product {
     description: string;
-    categoryId: number | null;  // 添加此字段
+    categoryId: number | null;
     details?: {
         material: string;
         dimensions: string;
